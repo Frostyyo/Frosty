@@ -79,7 +79,7 @@
       const address = document.createElement("p"); address.textContent = order.address; customer.append(address);
       if (order.notes) { const note = document.createElement("p"); note.textContent = `Note: ${order.notes}`; customer.append(note); }
       const items = document.createElement("div"); items.className = "items";
-      for (const item of (order.items || [])) { const line = document.createElement("p"); line.textContent = `${item.quantity} × ${item.name}${item.variant ? ` · ${item.variant}` : ""}`; items.append(line); }
+      for (const item of (order.items || [])) { const line = document.createElement("p"); line.textContent = `${item.quantity} × ${item.name}${item.variant ? ` · ${item.variant}` : ""} — EGP ${Number(item.price || 0).toLocaleString("en-US")}`; items.append(line); }
       const actions = document.createElement("div");
       const badge = document.createElement("span"); badge.className = `status ${order.status}`; badge.textContent = order.status; actions.append(badge);
       const select = document.createElement("select"); select.className = "field"; select.setAttribute("aria-label", "Change order status");
