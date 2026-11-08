@@ -100,7 +100,13 @@
   }
   $("loginForm").addEventListener("submit", async (event) => {
     event.preventDefault(); hideMessage("loginMessage"); $("loginBtn").disabled = true;
-    try { await api("/api/admin/login", { method:"POST", body:JSON.stringify({password:$("password").value}) }); showDashboard(); await loadOrders(); $("password").value = ""; }
+    try {
+      await api("/api/admin/login", { method:"POST", body:JSON.stringify({password:$("password").value}) });
+      $("password").value = "";
+      showDashboard();
+      try { await loadOrders(); }
+      catch (error) { message("pageMessage", error.message, true); }
+    }
     catch (error) { message("loginMessage", error.message, true); }
     finally { $("loginBtn").disabled = false; }
   });
