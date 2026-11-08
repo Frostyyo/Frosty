@@ -33,10 +33,12 @@ export async function onRequestPost({ request, env }) {
     const name = cleanText(item?.name, 120);
     const variant = cleanText(item?.variant, 80);
     const quantity = Number(item?.quantity);
-    if (!name || !Number.isInteger(quantity) || quantity < 1 || quantity > 99) {
+    const price = Number(item?.price);
+    if (!name || !Number.isInteger(quantity) || quantity < 1 || quantity > 99 ||
+        !Number.isFinite(price) || price < 0 || price > 1000000) {
       return json({ error: "One of the order items is invalid." }, 400);
     }
-    items.push({ name, variant, quantity });
+    items.push({ name, variant, quantity, price });
   }
 
   const id = crypto.randomUUID();
