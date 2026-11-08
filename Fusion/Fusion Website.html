@@ -1497,7 +1497,7 @@ function isValidEgyptianPhone(phone) {
 
 // PLACE DEMO ORDER
 
-function placeOrder(event) {
+async function placeOrder(event) {
 
     event.preventDefault();
 
@@ -1523,60 +1523,77 @@ function placeOrder(event) {
         return;
     }
 
-    const customer = {
-        name: form.get("name"),
-        phone: phone,
-        governorate: form.get("governorate"),
-        address: form.get("address"),
-        latitude: latitude,
-        longitude: longitude,
-        payment: form.get("payment"),
-        notes: form.get("notes")
-    };
+    const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const customerNotes = String(form.get("notes") || "").trim();
+    const notes = [
+        customerNotes,
+        "Payment: " + String(form.get("payment") || "Cash on Delivery"),
+        "Order total: " + formatPrice(total),
+        "Delivery coordinates: " + latitude + ", " + longitude
+    ].filter(Boolean).join(" | ").slice(0, 1000);
 
-    const order = {
-        orderNumber: "FUS-" + Date.now(),
-        customer: customer,
-        items: cart.map(item => ({
-            id: item.id,
-            name: item.name,
-            quantity: item.quantity,
-            price: item.price
-        })),
-        total: cart.reduce(
-            (sum, item) => sum + item.price * item.quantity, 0
-        )
-    };
+    const submitButton = event.submitter || event.target.querySelector('button[type="submit"]');
+    const originalButtonText = submitButton ? submitButton.textContent : "";
+    if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = "PLACING ORDER...";
+    }
 
-    // DEMO ONLY - SAVED IN THIS BROWSER
+    try {
+        const response = await fetch("/api/orders", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "same-origin",
+            body: JSON.stringify({
+                customerName: String(form.get("name") || "").trim(),
+                phone,
+                address: String(form.get("governorate") || "") + " — " + String(form.get("address") || "").trim(),
+                notes,
+                items: cart.map(item => ({
+                    name: item.name,
+                    variant: "",
+                    quantity: Number(item.quantity),
+                    price: Number(item.price)
+                }))
+            })
+        });
 
-    localStorage.setItem(
-        "fusion_last_demo_order",
-        JSON.stringify(order)
-    );
+        let result = {};
+        try { result = await response.json(); } catch (_) {}
 
-    alert(
-        "ORDER CREATED!\n\n" +
-        "Order: " + order.orderNumber +
-        "\nTotal: " + formatPrice(order.total) +
-        "\nLocation: " + latitude + ", " + longitude +
-        "\n\nThis is a demo. Your order was not sent to a store server."
-    );
+        if (!response.ok) {
+            throw new Error(result.error || "Could not place your order (" + response.status + ").");
+        }
 
-    cart = [];
-    updateCart();
-    closeCheckout();
-    event.target.reset();
+        const orderNumber = "FUS-" + String(result.orderId || "").slice(0, 8).toUpperCase();
+        alert(
+            "ORDER RECEIVED!\\n\\n" +
+            "Order: " + orderNumber +
+            "\\nTotal: " + formatPrice(total) +
+            "\\nYour order has been sent to FUSION."
+        );
 
-    // Reset selected map location
-    document.getElementById("latitude").value = "";
-    document.getElementById("longitude").value = "";
-    document.getElementById("locationStatus").textContent =
-        "Click anywhere on the map to select your delivery location.";
+        cart = [];
+        updateCart();
+        closeCheckout();
+        event.target.reset();
 
-    if (marker && map) {
-        map.removeLayer(marker);
-        marker = null;
+        document.getElementById("latitude").value = "";
+        document.getElementById("longitude").value = "";
+        document.getElementById("locationStatus").textContent =
+            "Click anywhere on the map to select your delivery location.";
+
+        if (marker && map) {
+            map.removeLayer(marker);
+            marker = null;
+        }
+    } catch (error) {
+        showToast(error.message || "ORDER FAILED. PLEASE TRY AGAIN.");
+    } finally {
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = originalButtonText;
+        }
     }
 }
 
