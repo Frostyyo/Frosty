@@ -25,3 +25,19 @@ export async function onRequestPatch({ request, env, params }) {
     return json({ error: "Could not update order." }, 500);
   }
 }
+
+
+export async function onRequestDelete({ request, env, params }) {
+  if (!isSameOrigin(request)) return json({ error: "Invalid request origin." }, 403);
+  if (!(await hasAdminSession(request, env.SESSION_SECRET))) return json({ error: "Please sign in." }, 401);
+  if (!env.DB) return json({ error: "Orders database is not connected." }, 503);
+
+  try {
+    const result = await env.DB.prepare("DELETE FROM orders WHERE id = ?")
+      .bind(params.id).run();
+    if (!result.meta?.changes) return json({ error: "Order not found." }, 404);
+    return json({ ok: true, deleted: true });
+  } catch {
+    return json({ error: "Could not delete order." }, 500);
+  }
+}
