@@ -14,8 +14,9 @@ export async function onRequestPost({ request, env }) {
     return json({ error: error.message }, 400);
   }
 
-  const submittedUsername = typeof body.username === "string" ? body.username.trim() : "";
-  const validUsername = submittedUsername === env.ADMIN_USERNAME;
+  const submittedUsername = typeof body.username === "string" ? body.username.trim().toLowerCase() : "";
+  const configuredUsername = env.ADMIN_USERNAME.trim().toLowerCase();
+  const validUsername = submittedUsername === configuredUsername;
   const validPassword = await passwordMatches(body.password, env.ADMIN_PASSWORD);
   if (!validUsername || !validPassword) {
     return json({ error: "Incorrect username or password." }, 401);
