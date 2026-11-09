@@ -24,7 +24,13 @@
     <section class="panel login" id="loginPanel">
       <h1>Welcome back.</h1><p>Sign in to manage store orders.</p>
       <div id="loginMessage" class="notice hidden" role="alert"></div>
-      <form id="loginForm"><label for="password">Admin password</label><input class="field" id="password" type="password" autocomplete="current-password" required><button class="btn primary" type="submit" id="loginBtn">Sign in</button></form>
+      <form id="loginForm">
+        <label for="username">Admin username</label>
+        <input class="field" id="username" type="text" autocomplete="username" required>
+        <label for="password">Admin password</label>
+        <input class="field" id="password" type="password" autocomplete="current-password" required>
+        <button class="btn primary" type="submit" id="loginBtn">Sign in</button>
+      </form>
     </section>
 
     <section id="dashboard" class="hidden">
@@ -101,7 +107,11 @@
   $("loginForm").addEventListener("submit", async (event) => {
     event.preventDefault(); hideMessage("loginMessage"); $("loginBtn").disabled = true;
     try {
-      await api("/api/admin/login", { method:"POST", body:JSON.stringify({password:$("password").value}) });
+      await api("/api/admin/login", { method:"POST", body:JSON.stringify({
+        username: $("username").value.trim(),
+        password: $("password").value
+      }) });
+      $("username").value = "";
       $("password").value = "";
       showDashboard();
       try { await loadOrders(); }
