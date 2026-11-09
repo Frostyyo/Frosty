@@ -1,4 +1,5 @@
 import { json, readJson, isSameOrigin } from "../_lib/http.js";
+import { getCustomerId } from "../_lib/customer-auth.js";
 
 function cleanText(value, maxLength) {
   if (typeof value !== "string") return "";
@@ -9,6 +10,9 @@ export async function onRequestPost({ request, env }) {
   if (!isSameOrigin(request)) return json({ error: "Invalid request origin." }, 403);
   if (!env.DB) return json({ error: "Orders database is not connected yet." }, 503);
 
+  const customerId = await getCustomerId(request, env.SESSION_SECRET);
+  if (!customerId) return json({ error: "Please create an account or sign in before placing an order." }, 401);
+
   let body;
   try {
     body = await readJson(request, 16_000);
@@ -16,13 +20,13 @@ export async function onRequestPost({ request, env }) {
     return json({ error: error.message }, 400);
   }
 
-  const customerName = cleanText(body.customerName, 100);
-  const phone = cleanText(body.phone, 25);
+  const account = await env.DB.prepare(
+    "SELECT id, full_name, phone FROM customers WHERE id = ?"
+  ).bind(customerId).first();
+  if (!account) return json({ error: "Your customer account could not be found. Please sign in again." }, 401);
+
   const address = cleanText(body.address, 350);
   const notes = cleanText(body.notes, 1000);
-
-  if (customerName.length < 2) return json({ error: "Please enter your name." }, 400);
-  if (!/^[+0-9()\-\s]{7,25}$/.test(phone)) return json({ error: "Please enter a valid phone number." }, 400);
   if (address.length < 5) return json({ error: "Please enter your delivery address." }, 400);
   if (!Array.isArray(body.items) || body.items.length < 1 || body.items.length > 30) {
     return json({ error: "Your order must contain between 1 and 30 items." }, 400);
@@ -45,9 +49,9 @@ export async function onRequestPost({ request, env }) {
   const createdAt = new Date().toISOString();
   try {
     await env.DB.prepare(
-      `INSERT INTO orders (id, created_at, customer_name, phone, address, notes, items_json, status)
-       VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')`,
-    ).bind(id, createdAt, customerName, phone, address, notes, JSON.stringify(items)).run();
+      `INSERT INTO orders (id, customer_id, created_at, customer_name, phone, address, notes, items_json, status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending')`,
+    ).bind(id, customerId, createdAt, account.full_name, account.phone, address, notes, JSON.stringify(items)).run();
   } catch {
     return json({ error: "We could not save your order. Please try again." }, 500);
   }
