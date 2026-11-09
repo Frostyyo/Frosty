@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>FUSION · My Account</title>
+  <link rel="icon" type="image/png" href="/Logo.png">
+  <style>
+    :root{color-scheme:dark;--bg:#090b10;--panel:#111620;--panel2:#171e2a;--line:#273243;--text:#f3f5f8;--muted:#98a4b7;--blue:#426dff;--green:#36c98b;--amber:#f3b84f;--red:#f06a73}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(900px 480px at 15% -10%,#18223b 0%,transparent 60%),var(--bg);color:var(--text);font:14px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif}
+    a{color:inherit;text-decoration:none}button,input{font:inherit}button{cursor:pointer}.wrap{max-width:1000px;margin:auto;padding:25px 18px 60px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:5px 0 22px;border-bottom:1px solid var(--line);margin-bottom:35px}
+    .brand{display:flex;align-items:center;gap:12px}.mark{height:40px;width:40px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(145deg,#27365b,#111620);border:1px solid #34425c;font-weight:900}
+    .brand strong{display:block;letter-spacing:.18em;font-size:13px}.brand small{color:var(--muted)}.back{color:#d8dfed;font-size:12px;border:1px solid var(--line);padding:9px 12px;border-radius:9px}
+    .card{max-width:470px;margin:6vh auto 0;padding:26px;border:1px solid var(--line);border-radius:17px;background:linear-gradient(180deg,rgba(23,30,42,.97),rgba(15,20,29,.97));box-shadow:0 18px 50px #0003}
+    h1{font-size:28px;letter-spacing:-.04em;margin:0 0 6px}.sub{margin:0 0 22px;color:var(--muted)}
+    .tabs{display:grid;grid-template-columns:1fr 1fr;gap:7px;background:#0b1018;border:1px solid var(--line);padding:5px;border-radius:11px;margin-bottom:20px}
+    .tab{border:0;border-radius:8px;padding:10px;background:transparent;color:var(--muted);font-weight:700}.tab.active{background:#26375f;color:white}
+    label{display:block;color:#c3ccda;font-size:12px;margin:14px 0 7px}.field{display:block;width:100%;min-width:0;padding:12px 13px;background:#0b1018;border:1px solid var(--line);border-radius:9px;color:var(--text);outline:none}
+    .field:focus{border-color:#6a8aff;box-shadow:0 0 0 3px #426dff22}.hint{font-size:11px;color:var(--muted);margin-top:7px}
+    .btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:10px;padding:11px 14px}.btn.primary{width:100%;margin-top:19px;background:var(--blue);border-color:var(--blue);font-weight:800}.btn:disabled{opacity:.6;cursor:wait}
+    .notice{margin:0 0 13px;padding:11px 13px;border-radius:9px;background:#18243a;color:#d3defa;font-size:12px}.notice.error{background:#331c24;color:#ffc4c8}.hidden{display:none!important}
+    .dashboard{max-width:900px;margin:0 auto}.dash-head{display:flex;justify-content:space-between;align-items:end;gap:15px;flex-wrap:wrap;margin-bottom:20px}.dash-head h1{margin-bottom:4px}.muted{color:var(--muted)}
+    .profile{border:1px solid var(--line);background:var(--panel);padding:15px 17px;border-radius:12px;margin-bottom:17px}.profile strong{display:block}.orders{border:1px solid var(--line);border-radius:15px;overflow:hidden;background:var(--panel)}
+    .orders-head{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px}.orders-head h2{font-size:15px;margin:0}
+    .order{padding:17px 18px;border-bottom:1px solid var(--line)}.order:last-child{border-bottom:0}.order-top{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.order-number{font-weight:850;letter-spacing:.04em}.date{color:var(--muted);font-size:11px}.status{font-size:11px;text-transform:capitalize;border:1px solid var(--line);padding:5px 10px;border-radius:999px}.status.pending{color:var(--amber);border-color:#735925}.status.confirmed{color:#9eb7ff;border-color:#344e96}.status.shipped{color:#c3a7ff;border-color:#59478c}.status.delivered{color:var(--green);border-color:#27674f}.status.cancelled{color:var(--red);border-color:#71373e}
+    .order-items{margin:13px 0 8px;color:#d9e0ec;font-size:12px}.order-items p{margin:4px 0}.order-notes{color:var(--muted);font-size:11px;overflow-wrap:anywhere}.empty{padding:45px 20px;text-align:center;color:var(--muted)}
+    .foot{text-align:center;color:#697589;font-size:11px;margin-top:28px}
+    @media(max-width:520px){.wrap{padding:16px 12px 38px}header{margin-bottom:18px}.card{margin:4vh auto 0;padding:20px}.dash-head{align-items:start;flex-direction:column}.orders-head{align-items:start}.order-top{align-items:start}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header>
+      <div class="brand"><div class="mark">F</div><div><strong>FUSION</strong><small>Customer account</small></div></div>
+      <a class="back" href="/">← Back to store</a>
+    </header>
+
+    <section class="card" id="authPanel">
+      <h1 id="authTitle">Welcome to FUSION.</h1>
+      <p class="sub" id="authSubtitle">Sign in to view and track your orders.</p>
+      <div id="authMessage" class="notice hidden" role="alert"></div>
+      <div class="tabs">
+        <button class="tab active" id="loginTab" type="button">Sign in</button>
+        <button class="tab" id="registerTab" type="button">Create account</button>
+      </div>
+
+      <form id="loginForm">
+        <label for="loginPhone">Mobile number</label>
+        <input class="field" id="loginPhone" name="phone" type="tel" inputmode="numeric" maxlength="11" placeholder="01012345678" pattern="01[0125][0-9]{8}" required>
+        <label for="loginPassword">Password</label>
+        <input class="field" id="loginPassword" name="password" type="password" autocomplete="current-password" required>
+        <button class="btn primary" id="loginButton" type="submit">Sign in</button>
+      </form>
+
+      <form id="registerForm" class="hidden">
+        <label for="fullName">Full name</label>
+        <input class="field" id="fullName" name="name" type="text" maxlength="100" autocomplete="name" required>
+        <label for="registerPhone">Mobile number</label>
+        <input class="field" id="registerPhone" name="phone" type="tel" inputmode="numeric" maxlength="11" placeholder="01012345678" pattern="01[0125][0-9]{8}" autocomplete="tel" required>
+        <label for="registerPassword">Create password</label>
+        <input class="field" id="registerPassword" name="password" type="password" minlength="10" maxlength="128" autocomplete="new-password" required>
+        <p class="hint">Use at least 10 characters. Your password is stored as a secure hash, not plain text.</p>
+        <button class="btn primary" id="registerButton" type="submit">Create account</button>
+      </form>
+      <p class="hint">Your account lets you see only your own orders and their latest status. Your mobile number is not verified by SMS in this version.</p>
+    </section>
+
+    <section class="dashboard hidden" id="dashboard">
+      <div class="dash-head">
+        <div><h1>My orders</h1><p class="sub" id="welcomeText">Your order history and status.</p></div>
+        <div style="display:flex;gap:8px"><button class="btn" id="refreshOrders">Refresh</button><button class="btn" id="logoutButton">Sign out</button></div>
+      </div>
+      <div class="profile" id="profileCard"></div>
+      <div id="dashboardMessage" class="notice hidden" role="status"></div>
+      <section class="orders">
+        <div class="orders-head"><h2>Order history</h2><span class="muted" id="orderCount">0 orders</span></div>
+        <div id="ordersList"><div class="empty">Loading your orders…</div></div>
+      </section>
+    </section>
+    <div class="foot">FUSION · Your account and order tracking</div>
+  </main>
+
+<script>
+  const $ = id => document.getElementById(id);
+  const returnToCheckout = new URLSearchParams(location.search).get("return") === "checkout";
+  let refreshTimer = null;
+
+  function showMessage(id,text,error=false) {
+    const el=$(id); el.textContent=text; el.classList.remove("hidden","error");
+    if(error) el.classList.add("error");
+  }
+  function clearMessage(id) { $(id).classList.add("hidden"); }
+  async function api(url,options={}) {
+    const response=await fetch(url,{credentials:"same-origin",...options,headers:{...(options.body?{"Content-Type":"application/json"}:{}),...(options.headers||{})}});
+    let data={}; try{data=await response.json()}catch{}
+    if(!response.ok) throw new Error(data.error || "Request failed ("+response.status+").");
+    return data;
+  }
+  function setMode(mode) {
+    const register=mode==="register";
+    $("loginForm").classList.toggle("hidden",register);
+    $("registerForm").classList.toggle("hidden",!register);
+    $("loginTab").classList.toggle("active",!register);
+    $("registerTab").classList.toggle("active",register);
+    $("authTitle").textContent=register?"Create your FUSION account.":"Welcome back.";
+    $("authSubtitle").textContent=register?"Create an account to place orders and track delivery.":"Sign in to view and track your orders.";
+    clearMessage("authMessage");
+  }
+  function statusClass(status) {
+    return ["pending","confirmed","shipped","delivered","cancelled"].includes(status)?status:"pending";
+  }
+  function renderOrders(orders) {
+    const list=$("ordersList"); list.replaceChildren();
+    $("orderCount").textContent=orders.length+" order"+(orders.length===1?"":"s");
+    if(!orders.length) {
+      const empty=document.createElement("div"); empty.className="empty"; empty.textContent="You have no orders yet. Your future orders will appear here.";
+      list.append(empty); return;
+    }
+    for(const order of orders) {
+      const card=document.createElement("article"); card.className="order";
+      const top=document.createElement("div"); top.className="order-top";
+      const identity=document.createElement("div");
+      const number=document.createElement("div"); number.className="order-number"; number.textContent="FUS-"+String(order.id).slice(0,8).toUpperCase();
+      const date=document.createElement("div"); date.className="date"; const d=new Date(order.created_at); date.textContent=Number.isNaN(d.getTime())?"":d.toLocaleString();
+      identity.append(number,date);
+      const badge=document.createElement("span"); badge.className="status "+statusClass(order.status); badge.textContent=order.status;
+      top.append(identity,badge); card.append(top);
+      const items=document.createElement("div"); items.className="order-items";
+      for(const item of (order.items||[])) {
+        const line=document.createElement("p");
+        line.textContent=item.quantity+" × "+item.name+" — EGP "+Number(item.price||0).toLocaleString("en-US");
+        items.append(line);
+      }
+      card.append(items);
+      if(order.notes) { const notes=document.createElement("p"); notes.className="order-notes"; notes.textContent=order.notes; card.append(notes); }
+      list.append(card);
+    }
+  }
+  async function loadOrders() {
+    const data=await api("/api/customer/orders");
+    renderOrders(data.orders||[]);
+  }
+  async function openDashboard(user) {
+    $("authPanel").classList.add("hidden");
+    $("dashboard").classList.remove("hidden");
+    $("welcomeText").textContent="Hello, "+user.name+". Follow your orders here.";
+    $("profileCard").replaceChildren();
+    const name=document.createElement("strong"); name.textContent=user.name;
+    const phone=document.createElement("span"); phone.className="muted"; phone.textContent=user.phone;
+    $("profileCard").append(name,phone);
+    try { await loadOrders(); }
+    catch(error) { showMessage("dashboardMessage",error.message,true); }
+    if(refreshTimer) clearInterval(refreshTimer);
+    refreshTimer=setInterval(()=>loadOrders().catch(()=>{}),45000);
+  }
+  async function finishAuth(data) {
+    if(returnToCheckout) {
+      location.href="/?checkout=1";
+      return;
+    }
+    await openDashboard(data.user);
+  }
+
+  $("loginTab").addEventListener("click",()=>setMode("login"));
+  $("registerTab").addEventListener("click",()=>setMode("register"));
+
+  $("loginForm").addEventListener("submit",async event=>{
+    event.preventDefault(); clearMessage("authMessage"); $("loginButton").disabled=true;
+    try {
+      const data=await api("/api/customer/login",{method:"POST",body:JSON.stringify({
+        phone:$("loginPhone").value,password:$("loginPassword").value
+      })});
+      $("loginPassword").value="";
+      await finishAuth(data);
+    } catch(error) { showMessage("authMessage",error.message,true); }
+    finally { $("loginButton").disabled=false; }
+  });
+
+  $("registerForm").addEventListener("submit",async event=>{
+    event.preventDefault(); clearMessage("authMessage"); $("registerButton").disabled=true;
+    try {
+      const data=await api("/api/customer/register",{method:"POST",body:JSON.stringify({
+        name:$("fullName").value,phone:$("registerPhone").value,password:$("registerPassword").value
+      })});
+      $("registerPassword").value="";
+      await finishAuth(data);
+    } catch(error) { showMessage("authMessage",error.message,true); }
+    finally { $("registerButton").disabled=false; }
+  });
+
+  $("refreshOrders").addEventListener("click",async()=>{
+    $("refreshOrders").disabled=true;
+    try { await loadOrders(); clearMessage("dashboardMessage"); }
+    catch(error) { showMessage("dashboardMessage",error.message,true); }
+    finally { $("refreshOrders").disabled=false; }
+  });
+  $("logoutButton").addEventListener("click",async()=>{
+    try { await api("/api/customer/logout",{method:"POST",body:"{}"}); } catch {}
+    if(refreshTimer) clearInterval(refreshTimer);
+    $("dashboard").classList.add("hidden"); $("authPanel").classList.remove("hidden"); setMode("login");
+  });
+
+  api("/api/customer/me").then(data=>openDashboard(data.user)).catch(()=>setMode(returnToCheckout?"register":"login"));
+</script>
+</body>
+</html>
