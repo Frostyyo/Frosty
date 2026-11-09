@@ -842,17 +842,72 @@ footer {
     .product-image { height: 180px; }
     .section-heading h2 { font-size: 24px; }
 }
+
+/* MOBILE HEADER + RESPONSIVE OVERFLOW FIX */
+html, body { max-width: 100%; overflow-x: hidden; }
+img, video, iframe { max-width: 100%; }
+header { width: 100%; min-width: 0; gap: 12px; }
+.logo { min-width: 0; flex: 0 1 auto; }
+.logo img { max-width: 100%; }
+.menu-toggle {
+    display: none; width: 40px; height: 40px; flex: 0 0 40px;
+    padding: 9px; border: 1px solid rgba(0,0,0,.18); border-radius: 3px;
+    background: transparent; color: #080808; align-items: center;
+    justify-content: center; flex-direction: column; gap: 5px; cursor: pointer;
+}
+.menu-toggle span {
+    display: block; width: 19px; height: 2px; background: currentColor;
+    transition: transform .2s ease, opacity .2s ease;
+}
+.menu-toggle.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.menu-toggle.active span:nth-child(2) { opacity: 0; }
+.menu-toggle.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.menu-toggle:focus-visible { outline: 2px solid #426dff; outline-offset: 3px; }
+@media (max-width: 600px) {
+    header { height: 68px; padding: 0 4%; justify-content: space-between; gap: 10px; }
+    .logo img { width: 142px; height: auto; max-width: 42vw; }
+    .menu-toggle { display: flex; margin-left: auto; }
+    header nav {
+        display: none; position: absolute; top: 100%; left: 0; right: 0;
+        width: 100%; padding: 8px 5% 14px; margin: 0;
+        flex-direction: column; align-items: stretch; gap: 0;
+        background: #F5F1E8; border-top: 1px solid rgba(0,0,0,.12);
+        border-bottom: 1px solid rgba(0,0,0,.15);
+        box-shadow: 0 12px 24px rgba(0,0,0,.14); z-index: 50;
+    }
+    header nav.open { display: flex; }
+    header nav a {
+        display: block; width: 100%; padding: 15px 3px;
+        border-bottom: 1px solid rgba(0,0,0,.10); font-size: 11px;
+        letter-spacing: 1.5px; text-align: left;
+    }
+    header nav a:last-child { border-bottom: 0; }
+    .header-actions { flex: 0 0 auto; gap: 7px; }
+    .icon-btn { min-width: 34px; min-height: 40px; font-size: 22px; }
+    .cart-count { top: 0; right: -5px; }
+}
+@media (max-width: 360px) {
+    .logo img { width: 125px; }
+    header { padding: 0 3%; gap: 7px; }
+    .menu-toggle { width: 36px; height: 38px; flex-basis: 36px; }
+}
+
 </style>
 </head>
 
 <body>
 
 <header>
-    <a class="logo" href="#">
+    <a class="logo" href="#" aria-label="FUSION home">
         <img src="Name.png" alt="FUSION Logo">
     </a>
 
-    <nav>
+    <button class="menu-toggle" id="menuToggle" type="button"
+        aria-label="Open navigation menu" aria-expanded="false" aria-controls="primaryNav">
+        <span></span><span></span><span></span>
+    </button>
+
+    <nav id="primaryNav" aria-label="Primary navigation">
         <a href="#">HOME</a>
         <a href="#shop">SHOP</a>
         <a href="#categories">CATEGORIES</a>
@@ -1628,6 +1683,40 @@ document.addEventListener("keydown", function(event) {
         closeCheckout();
     }
 });
+
+
+/* MOBILE NAVIGATION */
+const mobileMenuButton = document.getElementById("menuToggle");
+const primaryNav = document.getElementById("primaryNav");
+
+function closeMobileMenu() {
+    if (!mobileMenuButton || !primaryNav) return;
+    primaryNav.classList.remove("open");
+    mobileMenuButton.classList.remove("active");
+    mobileMenuButton.setAttribute("aria-expanded", "false");
+    mobileMenuButton.setAttribute("aria-label", "Open navigation menu");
+}
+
+if (mobileMenuButton && primaryNav) {
+    mobileMenuButton.addEventListener("click", function () {
+        const isOpen = primaryNav.classList.toggle("open");
+        mobileMenuButton.classList.toggle("active", isOpen);
+        mobileMenuButton.setAttribute("aria-expanded", String(isOpen));
+        mobileMenuButton.setAttribute("aria-label",
+            isOpen ? "Close navigation menu" : "Open navigation menu");
+    });
+    primaryNav.querySelectorAll("a").forEach(function (link) {
+        link.addEventListener("click", closeMobileMenu);
+    });
+    document.addEventListener("click", function (event) {
+        if (!primaryNav.contains(event.target) && !mobileMenuButton.contains(event.target)) {
+            closeMobileMenu();
+        }
+    });
+    window.addEventListener("resize", function () {
+        if (window.innerWidth > 600) closeMobileMenu();
+    });
+}
 
 // INITIALIZE
 
