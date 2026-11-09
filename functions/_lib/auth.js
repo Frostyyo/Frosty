@@ -62,9 +62,12 @@ export async function hasAdminSession(request, secret) {
 }
 
 export async function passwordMatches(input, expected) {
-  if (typeof input !== "string" || typeof expected !== "string" || !expected) return false;
+  if (typeof input !== "string" || typeof expected !== "string" || !expected.trim()) return false;
+  // Ignore accidental leading/trailing spaces pasted into the password field or secret.
+  const normalizedInput = input.trim();
+  const normalizedExpected = expected.trim();
   const digest = async (value) => new Uint8Array(await crypto.subtle.digest("SHA-256", encoder.encode(value)));
-  const [a, b] = await Promise.all([digest(input), digest(expected)]);
+  const [a, b] = await Promise.all([digest(normalizedInput), digest(normalizedExpected)]);
   let difference = 0;
   for (let i = 0; i < a.length; i++) difference |= a[i] ^ b[i];
   return difference === 0;
