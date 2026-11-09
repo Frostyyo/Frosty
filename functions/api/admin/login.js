@@ -3,8 +3,8 @@ import { json, readJson, isSameOrigin } from "../../_lib/http.js";
 
 export async function onRequestPost({ request, env }) {
   if (!isSameOrigin(request)) return json({ error: "Invalid request origin." }, 403);
-  if (!env.ADMIN_PASSWORD || !env.SESSION_SECRET) {
-    return json({ error: "Admin login is not configured. Add the required secrets in Cloudflare." }, 503);
+  if (!env.ADMIN_USERNAME || !env.ADMIN_PASSWORD || !env.SESSION_SECRET) {
+    return json({ error: "Admin login is not configured. Add ADMIN_USERNAME, ADMIN_PASSWORD, and SESSION_SECRET in Cloudflare." }, 503);
   }
 
   let body;
@@ -14,8 +14,12 @@ export async function onRequestPost({ request, env }) {
     return json({ error: error.message }, 400);
   }
 
-  const valid = await passwordMatches(body.password, env.ADMIN_PASSWORD);
-  if (!valid) return json({ error: "Incorrect password." }, 401);
+  const submittedUsername = typeof body.username === "string" ? body.username.trim() : "";
+  const validUsername = submittedUsername === env.ADMIN_USERNAME;
+  const validPassword = await passwordMatches(body.password, env.ADMIN_PASSWORD);
+  if (!validUsername || !validPassword) {
+    return json({ error: "Incorrect username or password." }, 401);
+  }
 
   return json({ ok: true }, 200, { "set-cookie": await createAdminCookie(env.SESSION_SECRET) });
 }
