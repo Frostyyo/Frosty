@@ -25,8 +25,12 @@ export async function onRequestPost({ request, env }) {
   ).bind(customerId).first();
   if (!account) return json({ error: "Your customer account could not be found. Please sign in again." }, 401);
 
+  const customerName = cleanText(body.customerName, 100);
+  const phone = cleanText(body.phone, 25);
   const address = cleanText(body.address, 350);
   const notes = cleanText(body.notes, 1000);
+  if (customerName.length < 2) return json({ error: "Please enter your name." }, 400);
+  if (!/^01[0125][0-9]{8}$/.test(phone)) return json({ error: "Please enter a valid Egyptian mobile number." }, 400);
   if (address.length < 5) return json({ error: "Please enter your delivery address." }, 400);
   if (!Array.isArray(body.items) || body.items.length < 1 || body.items.length > 30) {
     return json({ error: "Your order must contain between 1 and 30 items." }, 400);
@@ -51,7 +55,7 @@ export async function onRequestPost({ request, env }) {
     await env.DB.prepare(
       `INSERT INTO orders (id, customer_id, created_at, customer_name, phone, address, notes, items_json, status)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending')`,
-    ).bind(id, customerId, createdAt, account.full_name, account.phone, address, notes, JSON.stringify(items)).run();
+    ).bind(id, customerId, createdAt, customerName, phone, address, notes, JSON.stringify(items)).run();
   } catch {
     return json({ error: "We could not save your order. Please try again." }, 500);
   }
