@@ -912,6 +912,7 @@ header { width: 100%; min-width: 0; gap: 12px; }
         <a href="#shop">SHOP</a>
         <a href="#categories">CATEGORIES</a>
         <a href="#about">ABOUT</a>
+        <a href="/account.html">MY ACCOUNT</a>
     </nav>
 
     <div class="header-actions">
@@ -1227,7 +1228,14 @@ const products = [
     }
 ];
 
-let cart = [];
+let cart = (() => {
+    try {
+        const saved = JSON.parse(sessionStorage.getItem("fusion_cart") || "[]");
+        return Array.isArray(saved) ? saved : [];
+    } catch (_) {
+        return [];
+    }
+})();
 let currentCategory = "All";
 
 // FORMAT PRICE
@@ -1349,6 +1357,11 @@ function removeItem(id) {
 // UPDATE CART
 
 function updateCart() {
+
+    try {
+        if (cart.length) sessionStorage.setItem("fusion_cart", JSON.stringify(cart));
+        else sessionStorage.removeItem("fusion_cart");
+    } catch (_) {}
 
     const count = cart.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -1616,6 +1629,14 @@ async function placeOrder(event) {
         let result = {};
         try { result = await response.json(); } catch (_) {}
 
+        if (response.status === 401) {
+            // Keep the cart and checkout form in this tab while the customer signs in.
+            sessionStorage.setItem("fusion_cart", JSON.stringify(cart));
+            sessionStorage.setItem("fusion_checkout_form", JSON.stringify(Object.fromEntries(form.entries())));
+            window.location.href = "/account.html?return=checkout";
+            return;
+        }
+
         if (!response.ok) {
             throw new Error(result.error || "Could not place your order (" + response.status + ").");
         }
@@ -1630,6 +1651,7 @@ async function placeOrder(event) {
 
         cart = [];
         updateCart();
+        sessionStorage.removeItem("fusion_checkout_form");
         closeCheckout();
         event.target.reset();
 
@@ -1722,6 +1744,27 @@ if (mobileMenuButton && primaryNav) {
 
 renderProducts();
 updateCart();
+
+// Return to checkout after a customer signs in or creates an account.
+if (new URLSearchParams(window.location.search).get("checkout") === "1") {
+    try {
+        const saved = JSON.parse(sessionStorage.getItem("fusion_checkout_form") || "{}");
+        const checkoutForm = document.getElementById("checkoutForm");
+        for (const [key, value] of Object.entries(saved)) {
+            const field = checkoutForm?.elements?.namedItem(key);
+            if (field && typeof value === "string") field.value = value;
+        }
+        sessionStorage.removeItem("fusion_checkout_form");
+        if (cart.length) {
+            openCheckout();
+            const lat = Number(saved.latitude);
+            const lng = Number(saved.longitude);
+            if (Number.isFinite(lat) && Number.isFinite(lng) && lat && lng) {
+                setTimeout(() => selectDeliveryLocation(lat, lng), 350);
+            }
+        }
+    } catch (_) {}
+}
 
 </script>
 
