@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://fusionstore.pages.dev/sitemap.xml
